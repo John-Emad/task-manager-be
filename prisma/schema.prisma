@@ -6,10 +6,32 @@
 
 generator client {
   provider = "prisma-client-js"
-  // output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "mysql"
 }
 
+model User {
+  id           String   @id @default(cuid())
+  firstName    String   @db.VarChar(25)
+  lastName     String   @db.VarChar(25)
+  email        String   @unique
+  passwordHash String
+  username     String   @unique @db.VarChar(20)
+  tasks        Task[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(40)
+  description String?  @db.VarChar(300)
+  isDone      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+}
