@@ -19,6 +19,8 @@ async function bootstrap() {
       'https://task-manager-fe-kappa.vercel.app',
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Validation Pipe
