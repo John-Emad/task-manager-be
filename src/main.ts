@@ -10,6 +10,12 @@ async function bootstrap() {
   // To Enable Cookie parsing from requests
   app.use(cookieParser());
 
+  //Enable CORS
+  app.enableCors({
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    credentials: true,
+  });
+
   // Validation Pipe
   app.useGlobalPipes(
     new ValidationPipe({

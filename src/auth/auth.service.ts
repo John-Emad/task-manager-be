@@ -16,7 +16,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signup(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto) {
     // Check if user already exists
     const existingUser = await this.prisma.user.findFirst({
       where: {
@@ -61,15 +61,10 @@ export class AuthService {
     };
   }
 
-  async signin(loginDto: LoginDto) {
+  async logIn(loginDto: LoginDto) {
     // Find user by username or email
     const user = await this.prisma.user.findFirst({
-      where: {
-        OR: [
-          { username: loginDto.usernameOrEmail },
-          { email: loginDto.usernameOrEmail },
-        ],
-      },
+      where: { email: loginDto.email },
     });
 
     if (!user) {
@@ -109,5 +104,5 @@ export class AuthService {
     const { passwordHash, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
-}
 
+}

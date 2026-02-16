@@ -25,13 +25,19 @@ model User {
 }
 
 model Task {
-  id          String   @id @default(cuid())
-  title       String   @db.VarChar(40)
-  description String?  @db.VarChar(300)
-  isDone      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id          String    @id @default(cuid())
+  title       String    @db.VarChar(40)
+  description String?   @db.VarChar(300)
+  isDone      Boolean   @default(false)
+  dueDate     DateTime? @db.Date()
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+
+  @@unique([userId, title, dueDate])
+  @@index([userId])
+  @@index([userId, dueDate])
+  @@index([userId, createdAt])
 }
