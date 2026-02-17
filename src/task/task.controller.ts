@@ -69,14 +69,21 @@ export class TaskController {
     description: 'Unauthorized - user not authenticated',
   })
   findAll(@CurrentUser() user: any, @Query() filters: FilterTaskDto) {
+    // Convert string 'true'/'false' to boolean
+    let isDoneBoolean: boolean | undefined = undefined;
+    if (filters.isDone !== undefined) {
+      isDoneBoolean = filters.isDone === 'true';
+    }
+
     const filterOptions = {
-      isDone: filters.isDone,
+      isDone: isDoneBoolean,
       dueDateFrom: filters.dueDateFrom
         ? new Date(filters.dueDateFrom)
         : undefined,
       dueDateTo: filters.dueDateTo ? new Date(filters.dueDateTo) : undefined,
       search: filters.search,
     };
+
     return this.taskService.findAllByUser(user.id, filterOptions);
   }
 

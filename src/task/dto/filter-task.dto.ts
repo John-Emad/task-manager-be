@@ -1,21 +1,16 @@
-import { IsOptional, IsBoolean, IsDateString, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsOptional, IsDateString, IsString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class FilterTaskDto {
   @ApiPropertyOptional({
     description: 'Filter by completion status',
-    example: false,
-    type: Boolean,
+    example: 'false',
+    type: String,
+    enum: ['true', 'false'],
   })
   @IsOptional()
-  @Transform(({ value }) => {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    return value;
-  })
-  @IsBoolean()
-  isDone?: boolean;
+  @IsString()
+  isDone?: string;
 
   @ApiPropertyOptional({
     description: 'Filter tasks with due date from this date',
@@ -46,4 +41,3 @@ export class FilterTaskDto {
   @IsString()
   search?: string;
 }
-

@@ -74,10 +74,16 @@ export class TaskService {
       if (filters?.dueDateFrom || filters?.dueDateTo) {
         where.dueDate = {};
         if (filters.dueDateFrom) {
-          where.dueDate.gte = filters.dueDateFrom;
+          // Normalize to start of day in UTC to match how dates are stored
+          const normalizedFrom = new Date(filters.dueDateFrom);
+          normalizedFrom.setUTCHours(0, 0, 0, 0);
+          where.dueDate.gte = normalizedFrom;
         }
         if (filters.dueDateTo) {
-          where.dueDate.lte = filters.dueDateTo;
+          // Normalize to end of day in UTC
+          const normalizedTo = new Date(filters.dueDateTo);
+          normalizedTo.setUTCHours(23, 59, 59, 999);
+          where.dueDate.lte = normalizedTo;
         }
       }
 
@@ -261,15 +267,25 @@ export class TaskService {
    */
   async getStatistics(userId: string) {
     try {
+      const now = new Date();
       const [total, completed, pending, overdue] = await Promise.all([
         this.prisma.task.count({ where: { userId } }),
         this.prisma.task.count({ where: { userId, isDone: true } }),
-        this.prisma.task.count({ where: { userId, isDone: false } }),
         this.prisma.task.count({
           where: {
             userId,
             isDone: false,
-            dueDate: { lt: new Date() },
+            OR: [
+              { dueDate: null }, // Tasks with no due date
+              { dueDate: { gte: now } }, // Tasks with due date in the future or today
+            ],
+          },
+        }),
+        this.prisma.task.count({
+          where: {
+            userId,
+            isDone: false,
+            dueDate: { lt: now },
           },
         }),
       ]);
